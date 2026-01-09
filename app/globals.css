@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #FFF8E7;
+  background-image: linear-gradient(135deg, #FFF8E7 0%, #FAF4E8 100%);
+  color: #3E1F0D;
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Subtle Ganga ghat water wave pattern overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(0deg, transparent 24%, rgba(232, 185, 35, 0.02) 25%, rgba(232, 185, 35, 0.02) 26%, transparent 27%, transparent 74%, rgba(232, 185, 35, 0.02) 75%, rgba(232, 185, 35, 0.02) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, rgba(232, 185, 35, 0.02) 25%, rgba(232, 185, 35, 0.02) 26%, transparent 27%, transparent 74%, rgba(232, 185, 35, 0.02) 75%, rgba(232, 185, 35, 0.02) 76%, transparent 77%, transparent);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: #6B1A1A;
+}
+
+.container-custom {
+  @apply max-w-7xl mx-auto px-4 md:px-6 lg:px-8;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure all sections respect container bounds */
+section, main, div {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* Prevent any element from causing horizontal scroll */
+* {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.glass-effect {
+  background: rgba(255, 248, 231, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(232, 185, 35, 0.2);
+  box-shadow: 0 8px 32px rgba(107, 26, 26, 0.1);
+}
+
+.glass-effect-dark {
+  background: rgba(59, 31, 13, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(232, 185, 35, 0.3);
+}
+
+.gradient-overlay {
+  background: linear-gradient(135deg, rgba(59, 31, 13, 0.6) 0%, rgba(107, 26, 26, 0.4) 100%);
+}
+
+.gradient-overlay-light {
+  background: linear-gradient(135deg, rgba(232, 185, 35, 0.15) 0%, rgba(232, 185, 35, 0.05) 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #E8B923 0%, #F4D96E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-maroon {
+  background: linear-gradient(135deg, #6B1A1A 0%, #8B2424 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow-gold {
+  text-shadow: 0 0 10px rgba(232, 185, 35, 0.3), 0 0 20px rgba(232, 185, 35, 0.1);
+}
+
+.glow-box {
+  box-shadow: 0 0 20px rgba(232, 185, 35, 0.3), 0 0 40px rgba(232, 185, 35, 0.1);
+}
+
+.glow-box-hover:hover {
+  box-shadow: 0 0 30px rgba(232, 185, 35, 0.5), 0 0 60px rgba(232, 185, 35, 0.2);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.elevate {
+  box-shadow: 0 15px 40px rgba(59, 31, 13, 0.15);
+}
+
+.elevate-hover:hover {
+  box-shadow: 0 25px 60px rgba(59, 31, 13, 0.2);
+}
+
+.transition-smooth {
+  transition: all 0.3s ease-in-out;
+}
+
+.hover-lift {
+  @apply transition-smooth hover:shadow-2xl hover:-translate-y-2;
+}
+
+.sacred-border {
+  border-image: linear-gradient(135deg, #E8B923 0%, #6B1A1A 50%, #E8B923 100%) 1;
+}
+
+/* Spiritual ornament decorative element */
+.ornament::before,
+.ornament::after {
+  content: '◆';
+  color: #E8B923;
+  font-size: 0.8em;
+  margin: 0 0.5em;
+  opacity: 0.6;
+}
+
+@media (max-width: 640px) {
+  html {
+    scroll-padding-top: 60px;
+  }
+}
+
+/* Scrollbar styling with Varanasi aesthetics */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFF8E7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #E8B923 0%, #6B1A1A 100%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #F4D96E 0%, #8B2424 100%);
+}
+
+/* Selection color */
+::selection {
+  background-color: #6B1A1A;
+  color: #FFF8E7;
+}
+
+::-moz-selection {
+  background-color: #6B1A1A;
+  color: #FFF8E7;
+}

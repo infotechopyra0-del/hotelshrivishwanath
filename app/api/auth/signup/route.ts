@@ -1,0 +1,93 @@
+import { NextRequest, NextResponse } from 'next/server'
+import bcryptjs from 'bcryptjs'
+import dbConnect from '@/lib/dbConnect'
+import Customer from '@/models/Customer'
+
+export async function POST(request: NextRequest) {
+  try {
+    await dbConnect()
+    
+    const { fullName, email, password } = await request.json()
+
+    // Validation
+    if (!fullName || !email || !password) {
+      return NextResponse.json(
+        { message: 'All fields are required' },
+        { status: 400 }
+      )
+    }
+
+    if (fullName.length < 3) {
+      return NextResponse.json(
+        { message: 'Name must be at least 3 characters' },
+        { status: 400 }
+      )
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { message: 'Invalid Email Id' },
+        { status: 400 }
+      )
+    }
+
+    // Check if email is from Gmail (real Gmail verification)
+    if (!email.toLowerCase().endsWith('@gmail.com')) {
+      return NextResponse.json(
+        { message: 'Invalid Email Id' },
+        { status: 400 }
+      )
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json(
+        { message: 'Password must be at least 6 characters' },
+        { status: 400 }
+      )
+    }
+
+    // Check if user already exists
+    const existingUser = await Customer.findOne({ email: email.toLowerCase() })
+    if (existingUser) {
+      return NextResponse.json(
+        { message: 'Email Already Exist' },
+        { status: 400 }
+      )
+    }
+
+    // Hash password
+    const hashedPassword = await bcryptjs.hash(password, 12)
+
+    // Create new user
+    const newUser = new Customer({
+      name: fullName,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      role: 'user', // Always set to user by default
+      isVerified: true, // Auto-verify for now
+    })
+
+    await newUser.save()
+
+    return NextResponse.json(
+      { 
+        message: 'Account created successfully',
+        user: {
+          id: newUser._id.toString(),
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role
+        }
+      },
+      { status: 201 }
+    )
+  } catch (error) {
+    console.error('Signup error:', error)
+    return NextResponse.json(
+      { message: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
