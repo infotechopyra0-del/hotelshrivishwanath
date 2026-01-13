@@ -103,7 +103,7 @@ const Navbar = () => {
                 Profile
               </Link>
               <Link 
-                href="/booking" 
+                href="/my-bookings" 
                 onClick={() => {
                   setShowUserMenu(false)
                   if (isMobile) setIsOpen(false)

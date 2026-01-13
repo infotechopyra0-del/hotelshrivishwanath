@@ -1,6 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose'
 
-// Interface for Booking document
 export interface IBooking extends Document {
   bookingId: string
   customer: mongoose.Types.ObjectId
@@ -192,7 +191,6 @@ BookingSchema.virtual('remainingAmount').get(function(this: IBooking) {
 })
 
 // Index for efficient queries
-BookingSchema.index({ bookingId: 1 }, { unique: true })
 BookingSchema.index({ customer: 1 })
 BookingSchema.index({ room: 1 })
 BookingSchema.index({ checkIn: 1, checkOut: 1 })
@@ -276,12 +274,12 @@ BookingSchema.methods.cancel = function(reason: string) {
   return this.save()
 }
 
-BookingSchema.methods.checkIn = function() {
+BookingSchema.methods.checkInGuest = function() {
   this.bookingStatus = 'Checked-In'
   return this.save()
 }
 
-BookingSchema.methods.checkOut = function() {
+BookingSchema.methods.checkOutGuest = function() {
   this.bookingStatus = 'Checked-Out'
   return this.save()
 }

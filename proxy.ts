@@ -5,26 +5,30 @@ export default withAuth(
   function middleware(req) {
     const { pathname } = req.nextUrl
     const token = req.nextauth.token
-
-    // Check if authenticated user is trying to access auth routes
     if (token && (pathname === '/auth/signin' || pathname === '/auth/signup')) {
       return NextResponse.redirect(new URL('/', req.url))
     }
-
-    // Check if user is trying to access profile route
     if (pathname === '/profile') {
-      // If not authenticated, redirect to home
       if (!token) {
         return NextResponse.redirect(new URL('/', req.url))
       }
     }
-
-    // Check if user is trying to access admin routes
     if (pathname.startsWith('/admin')) {
-      // If user role is not admin, redirect to home
-      if (token?.role !== 'admin') {
+      console.log('[MIDDLEWARE] Admin route detected:', pathname);
+      if (!token) {
+        console.log('[MIDDLEWARE] No token found. Redirecting to /');
         return NextResponse.redirect(new URL('/', req.url))
       }
+      console.log('[MIDDLEWARE] Token found:', token);
+      if (token?.role !== 'admin') {
+        console.log('[MIDDLEWARE] Token role is not admin:', token.role, '. Redirecting to /');
+        return NextResponse.redirect(new URL('/', req.url))
+      }
+      if (pathname === '/admin') {
+        console.log('[MIDDLEWARE] /admin root accessed by admin. Redirecting to /admin/dashboard');
+        return NextResponse.redirect(new URL('/admin/dashboard', req.url))
+      }
+      console.log('[MIDDLEWARE] Admin access granted for:', pathname);
     }
     
     return NextResponse.next()

@@ -67,7 +67,7 @@ const config = {
         glass: '10px',
       },
       backgroundImage: {
-        'ghat-texture': "url('data:image/svg+xml,%3Csvg width=\"100\" height=\"100\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cdefs%3E%3CpatternId=\"ghat\" patternUnits=\"userSpaceOnUse\" width=\"100\" height=\"100\"%3E%3Cpath d=\"M0 50 Q25 40 50 50 T100 50\" stroke=\"%23E8B92330\" stroke-width=\"0.5\" fill=\"none\"/%3E%3Cpath d=\"M0 30 Q25 20 50 30 T100 30\" stroke=\"%23E8B92320\" stroke-width=\"0.5\" fill=\"none\"/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\"100\" height=\"100\" fill=\"%23FFF8E7\" /%3E%3Crect width=\"100\" height=\"100\" fill=\"url(%23ghat)\" /%3E%3C/svg%3E')",
+        'ghat-texture': "url('data:image/svg+xml,%3Csvg width=\"100\" height=\"100\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cdefs%3E%3Cpattern id=\"ghat\" patternUnits=\"userSpaceOnUse\" width=\"100\" height=\"100\"%3E%3Cpath d=\"M0 50 Q25 40 50 50 T100 50\" stroke=\"%23E8B92330\" stroke-width=\"0.5\" fill=\"none\"/%3E%3Cpath d=\"M0 30 Q25 20 50 30 T100 30\" stroke=\"%23E8B92320\" stroke-width=\"0.5\" fill=\"none\"/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=\"100\" height=\"100\" fill=\"%23FFF8E7\" /%3E%3Crect width=\"100\" height=\"100\" fill=\"url(%23ghat)\" /%3E%3C/svg%3E')",
       },
     },
   },

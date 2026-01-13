@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document, CallbackError } from 'mongoose'
 import bcrypt from 'bcryptjs'
 
-// Interface for Customer document
 export interface ICustomer extends Document {
   name: string
   email: string

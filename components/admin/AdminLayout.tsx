@@ -1,165 +1,134 @@
-'use client'
+"use client"
+import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { LayoutDashboard, Code, FolderKanban, MessageSquareQuote, Users, Briefcase, Menu, X, LogOut, Sparkles, Star, Zap } from 'lucide-react';
+import Link from 'next/link';
 
-import { ReactNode } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { 
-  LayoutDashboard, 
-  Users, 
-  Bed, 
-  Calendar, 
-  Star, 
-  Tag, 
-  Gift,
-  LogOut,
-  Menu,
-  X
-} from 'lucide-react'
-import { signOut } from 'next-auth/react'
-import { useState } from 'react'
-
-interface AdminLayoutProps {
-  children: ReactNode
+interface MenuItem {
+  id: string;
+  label: string;
+  icon: any;
+  href: string;
 }
 
-interface NavItem {
-  name: string
-  href: string
-  icon: any
-}
+export default function AdminSidebar() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
-const navItems: NavItem[] = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-  { name: 'Customers', href: '/admin/dashboard/customers', icon: Users },
-  { name: 'Rooms', href: '/admin/dashboard/rooms', icon: Bed },
-  { name: 'Orders', href: '/admin/dashboard/orders', icon: Calendar },
-  { name: 'Reviews', href: '/admin/dashboard/reviews', icon: Star },
-  { name: 'Categories', href: '/admin/dashboard/categories', icon: Tag },
-  { name: 'Coupons', href: '/admin/dashboard/coupons', icon: Gift },
-]
-
-export default function AdminLayout({ children }: AdminLayoutProps) {
-  const pathname = usePathname()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const menuItems: MenuItem[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, href: '/admin/dashboard' },
+    { id: 'users', label: 'Users', icon: Users, href: '/admin/dashboard/users' },
+    { id: 'bookings', label: 'Bookings', icon: Briefcase, href: '/admin/dashboard/bookings' },
+    { id: 'galary', label: 'Galary', icon: Star, href: '/admin/dashboard/galary' },
+    { id: 'rooms', label: 'Rooms', icon: FolderKanban, href: '/admin/dashboard/rooms' },
+    { id: 'faq', label: 'FAQ', icon: MessageSquareQuote, href: '/admin/dashboard/faq' },
+    { id: 'partnersplatforms', label: 'Partners Platforms', icon: Code, href: '/admin/dashboard/partnersplatforms' },
+    { id: 'contacts', label: 'Contacts', icon: Sparkles, href: '/admin/dashboard/contacts' },
+  ];
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' })
-  }
+    try {
+      const response = await fetch('/api/admin/logout', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        window.location.href = '/';
+      }
+    } catch (error) {
+      window.location.href = '/';
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Mobile sidebar overlay */}
+    <>
+      {/* Mobile Menu Button - FIXED POSITION, ALWAYS VISIBLE */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="lg:hidden fixed top-5 left-4 z-[60] bg-varanasi-maroon text-varanasi-gold p-2.5 rounded-lg shadow-2xl hover:scale-110 transition-transform duration-300 border border-varanasi-gold"
+        aria-label="Toggle menu"
+      >
+        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* Sidebar Overlay for Mobile */}
       {sidebarOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 lg:hidden"
-        >
-          <div 
-            className="absolute inset-0 bg-gray-600 opacity-75"
-            onClick={() => setSidebarOpen(false)}
-          ></div>
-        </motion.div>
+        <div
+          className="lg:hidden fixed inset-0 bg-varanasi-maroon bg-opacity-40 z-40 backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
       )}
 
-      {/* Sidebar */}
-      <motion.div
-        initial={false}
-        animate={{ x: sidebarOpen ? 0 : -320 }}
-        className={`fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-lg transform lg:translate-x-0 lg:static lg:inset-0 transition-transform duration-300 ease-in-out`}
+      {/* Sidebar - HIGHER Z-INDEX THAN MENU BUTTON */}
+      <aside
+        className={`fixed top-0 left-0 h-full w-72 bg-varanasi-cream shadow-2xl transform transition-transform duration-300 z-50 border-r-4 border-varanasi-gold ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}
       >
-        <div className="flex items-center justify-between h-16 px-6 bg-gradient-to-r from-amber-600 via-orange-600 to-red-700">
-          <h1 className="text-xl font-bold text-white">Admin Panel</h1>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-white hover:text-gray-200"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <nav className="mt-8">
-          <div className="px-6 space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon
-              const isActive = pathname === item.href
-              
-              return (
-                <Link key={item.href} href={item.href}>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-amber-100 text-amber-900 border-l-4 border-amber-600'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
-                  >
-                    <Icon className="mr-3 h-5 w-5" />
-                    {item.name}
-                  </motion.div>
-                </Link>
-              )
-            })}
-          </div>
-
-          <div className="mt-8 pt-8 border-t border-gray-200 px-6">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleLogout}
-              className="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Logout
-            </motion.button>
-          </div>
-        </nav>
-      </motion.div>
-
-      {/* Main content */}
-      <div className="lg:pl-80">
-        {/* Top navigation */}
-        <div className="sticky top-0 z-10 flex h-16 bg-white shadow">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 lg:hidden"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+        <div className="h-full flex flex-col relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-varanasi-gold opacity-10 rounded-full blur-3xl"></div>
           
-          <div className="flex flex-1 justify-between px-6 items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Hotel Shri Vishwanath Admin
-              </h2>
+          {/* Logo/Header */}
+          <div className="p-6 border-b-2 border-varanasi-gold bg-varanasi-maroon relative overflow-hidden">
+            <div className="absolute top-0 right-0">
+              <Sparkles className="text-varanasi-gold opacity-20" size={60} />
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600">
-                Welcome, Admin
+            <Link href="/admin/dashboard" className="flex items-center space-x-3 relative z-10" onClick={() => setSidebarOpen(false)}>
+              <div>
+                <h2 className="text-varanasi-gold font-black text-xl flex items-center">
+                  HotelShriVishwanath
+                  <Star className="ml-1 text-varanasi-gold" size={16} />
+                </h2>
+                <p className="text-varanasi-gold/80 text-xs font-bold tracking-wide">Admin Portal</p>
               </div>
-              <div className="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-semibold">A</span>
-              </div>
-            </div>
+            </Link>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto p-4 relative">
+            <ul className="space-y-2">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href;
+                return (
+                  <li key={item.id}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`group w-full flex items-center justify-between px-4 py-3.5 rounded-xl font-bold transition-all duration-300 border ${
+                        isActive
+                          ? 'bg-varanasi-maroon text-varanasi-gold border-varanasi-gold shadow-xl transform scale-105'
+                          : 'text-varanasi-brown border-transparent hover:bg-varanasi-gold/10 hover:text-varanasi-maroon hover:border-varanasi-gold hover:scale-105'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <Icon size={20} />
+                        <span>{item.label}</span>
+                      </div>
+                      {isActive && <Zap size={16} className="animate-pulse text-varanasi-gold" />}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          {/* Bottom Actions */}
+          <div className="p-4 border-t-2 border-varanasi-gold space-y-2 bg-varanasi-maroon/5">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-bold text-varanasi-maroon hover:bg-varanasi-gold/20 hover:scale-105 transition-all duration-300 shadow-sm border border-varanasi-maroon/20"
+            >
+              <LogOut size={20} />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
+      </aside>
 
-        {/* Page content */}
-        <main className="flex-1 relative overflow-y-auto focus:outline-none">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="py-6"
-          >
-            {children}
-          </motion.div>
-        </main>
-      </div>
-    </div>
-  )
+      {/* Spacer for desktop - pushes content to the right */}
+      <div className="hidden lg:block w-72"></div>
+    </>
+  );
 }
