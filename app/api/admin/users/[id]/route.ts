@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 // GET - Fetch single user by ID
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } } | Promise<{ params: { id: string } }>
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication and admin role
@@ -23,8 +23,7 @@ export async function GET(
 
     await dbConnect();
 
-    const { params } = await Promise.resolve(context);
-    const { id } = params;
+    const { id } = await params;
 
     // Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -60,7 +59,7 @@ export async function GET(
 // PUT - Update user
 export async function PUT(
   req: NextRequest,
-  context: { params: { id: string } } | Promise<{ params: { id: string } }>
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication and admin role
@@ -75,8 +74,7 @@ export async function PUT(
 
     await dbConnect();
 
-    const { params } = await Promise.resolve(context);
-    const { id } = params;
+    const { id } = await params;
 
     // Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -149,7 +147,7 @@ export async function PUT(
 // DELETE - Delete user
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -163,11 +161,14 @@ export async function DELETE(
 
     await dbConnect();
 
-    const { id } = params;
+    const { id } = await params;
+
+    console.log('DELETE request for user ID:', id);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
+      console.log('Invalid ObjectId provided for deletion:', id);
       return NextResponse.json(
-        { error: 'Invalid user ID' },
+        { error: `Invalid user ID format: ${id}` },
         { status: 400 }
       );
     }

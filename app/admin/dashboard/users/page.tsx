@@ -122,6 +122,12 @@ export default function AdminUsersPage() {
   });
 
   const handleDeleteClick = (id: string) => {
+    if (!id || id.startsWith('user-')) {
+      console.error('Cannot delete user with invalid ID:', id);
+      // You might want to show a toast notification here instead of alert
+      console.warn('Cannot delete user: Invalid user ID');
+      return;
+    }
     setUserToDelete(id);
     setDeleteDialogOpen(true);
   };
@@ -135,13 +141,22 @@ export default function AdminUsersPage() {
         headers: { "Content-Type": "application/json" },
       });
 
-      if (!response.ok) throw new Error("Failed to delete");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to delete user: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log(result.message); // Success message
 
       setUsers((prev) =>
         prev.filter((u) => (u.id ?? u._id) !== userToDelete)
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting user:", error);
+      // You might want to show a toast notification here
+      const errorMessage = error.message || 'Unknown error occurred';
+      console.error(`Failed to delete user: ${errorMessage}`);
     } finally {
       setDeleteDialogOpen(false);
       setUserToDelete(null);
@@ -325,7 +340,11 @@ export default function AdminUsersPage() {
               <>
                 <div className="block md:hidden space-y-4">
                   {filteredUsers.map((user: User, index: number) => {
-                    const uid = user.id ?? user._id ?? `user-${index}`;
+                    const uid = user._id || user.id;
+                    if (!uid) {
+                      console.error('User missing valid ID:', user);
+                      return null;
+                    }
                     const tier = getTierBadge(user.totalSpent);
                     
                     return (
@@ -436,7 +455,11 @@ export default function AdminUsersPage() {
                 <div className="hidden md:block lg:hidden">
                   <div className="grid grid-cols-1 gap-4">
                     {filteredUsers.map((user: User, index: number) => {
-                      const uid = user.id ?? user._id ?? `user-${index}`;
+                      const uid = user._id || user.id;
+                      if (!uid) {
+                        console.error('User missing valid ID:', user);
+                        return null;
+                      }
                       const tier = getTierBadge(user.totalSpent);
                       
                       return (
@@ -533,7 +556,11 @@ export default function AdminUsersPage() {
                     </thead>
                     <tbody>
                       {filteredUsers.map((user: User, index: number) => {
-                        const uid = user.id ?? user._id ?? `user-${index}`;
+                        const uid = user._id || user.id;
+                        if (!uid) {
+                          console.error('User missing valid ID:', user);
+                          return null;
+                        }
                         const tier = getTierBadge(user.totalSpent);
                         
                         return (

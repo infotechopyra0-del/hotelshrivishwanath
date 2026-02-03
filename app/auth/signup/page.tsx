@@ -102,39 +102,49 @@ const SignupPage = () => {
       })
       const data = await response.json()
       if (response.ok) {
-        toast.success('Account created successfully!', {
-          description: `Welcome to Shri Vishwanath Hotel, ${formData.fullName}!`,
-          duration: 3000,
-        })
+        // If server requires verification, inform user to check their email
+        if (data?.requiresVerification) {
+          toast.success('Account created. Check your email for the OTP to verify your account.', {
+            duration: 5000,
+          })
 
-        // Clear form
-        setFormData({
-          fullName: '',
-          email: '',
-          password: '',
-          confirmPassword: ''
-        })
+          // Clear form
+          setFormData({ fullName: '', email: '', password: '', confirmPassword: '' })
 
-        // Auto-login user after successful signup
-        const loginResult = await signIn('credentials', {
-          email: formData.email,
-          password: formData.password,
-          redirect: false,
-        })
-
-        if (loginResult?.ok) {
-          // Set cookie with email
-          document.cookie = `userEmail=${formData.email}; path=/; max-age=2592000; SameSite=Lax`
-          
-          // Redirect to home page
-          setTimeout(() => {
-            router.push('/')
-          }, 1000)
-        } else {
-          // If auto-login fails, redirect to signin
+          // Redirect to signin where user can verify/login
           setTimeout(() => {
             router.push('/auth/signin')
-          }, 2000)
+          }, 1200)
+        } else {
+          toast.success('Account created successfully!', {
+            description: `Welcome to Shri Vishwanath Hotel, ${formData.fullName}!`,
+            duration: 3000,
+          })
+
+          // Clear form
+          setFormData({ fullName: '', email: '', password: '', confirmPassword: '' })
+
+          // Auto-login user after successful signup
+          const loginResult = await signIn('credentials', {
+            email: formData.email,
+            password: formData.password,
+            redirect: false,
+          })
+
+          if (loginResult?.ok) {
+            // Set cookie with email
+            document.cookie = `userEmail=${formData.email}; path=/; max-age=2592000; SameSite=Lax`
+            
+            // Redirect to home page
+            setTimeout(() => {
+              router.push('/')
+            }, 1000)
+          } else {
+            // If auto-login fails, redirect to signin
+            setTimeout(() => {
+              router.push('/auth/signin')
+            }, 2000)
+          }
         }
       } else {
         toast.error('Signup failed', {
@@ -212,7 +222,7 @@ const SignupPage = () => {
           </div>
 
           {/* Signup Form */}
-          <div className="px-4 py-4 sm:px-6 sm:py-5">
+          <div suppressHydrationWarning className="px-4 py-4 sm:px-6 sm:py-5">
             <div className="space-y-3 sm:space-y-3.5">
               {/* Full Name Field */}
               <div>
@@ -423,11 +433,6 @@ const SignupPage = () => {
             </p>
           </div>
         </motion.div>
-
-        {/* Footer */}
-        <p className="absolute bottom-4 sm:bottom-6 text-center text-[10px] sm:text-xs text-amber-700 px-4">
-          Protected by reCAPTCHA and subject to Anthropic's Privacy Policy
-        </p>
       </div>
     </div>
   )

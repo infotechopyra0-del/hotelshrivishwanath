@@ -6,8 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 export default function WhatsAppChat() {
   const [isOpen, setIsOpen] = useState(false)
-
-  // Hotel's WhatsApp number (from contact info)
   const whatsappNumber = '916390057777'
   const message = `Hello! I'm interested in booking a room at Hotel Shri Vishwanath. Could you please help me with availability and pricing?`
 

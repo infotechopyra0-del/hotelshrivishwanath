@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcryptjs from 'bcryptjs'
 import dbConnect from '@/lib/dbConnect'
 import Customer from '@/models/Customer'
+import { sendOTPEmail } from '@/lib/mailer'
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,20 +61,33 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcryptjs.hash(password, 12)
 
-    // Create new user
+    // Create new user (unverified until OTP is validated)
     const newUser = new Customer({
       name: fullName,
       email: email.toLowerCase(),
       password: hashedPassword,
       role: 'user', // Always set to user by default
-      isVerified: true, // Auto-verify for now
+      isVerified: false,
     })
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    newUser.otpCode = otp
+    newUser.otpExpires = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
 
     await newUser.save()
 
+    // Send OTP email (fire-and-forget; log errors)
+    try {
+      await sendOTPEmail(newUser.email, otp)
+    } catch (err) {
+      console.error('Failed to send OTP email:', err)
+    }
+
     return NextResponse.json(
       { 
-        message: 'Account created successfully',
+        message: 'Account created successfully. OTP sent to email.',
+        requiresVerification: true,
         user: {
           id: newUser._id.toString(),
           name: newUser.name,

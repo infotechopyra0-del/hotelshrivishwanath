@@ -1,6 +1,6 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import {
   Sparkles,
   Star,
@@ -69,18 +69,6 @@ export default function AdminRoomsPage() {
     fetchRooms();
   }, []);
 
-  const showToast = (message: string, type: "success" | "error" | "info" = "success") => {
-    const toast = document.createElement("div");
-    toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg font-bold text-white ${
-      type === "success" ? "bg-green-600" : type === "error" ? "bg-red-600" : "bg-blue-600"
-    } animate-fade-in`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.remove();
-    }, 3000);
-  };
-
   const fetchRooms = async (opts: { forceToast?: boolean } = {}) => {
     setLoading(true);
     try {
@@ -92,12 +80,12 @@ export default function AdminRoomsPage() {
       const data: Room[] = await res.json();
       setRooms(data);
       if (!loadToastShownRef.current || opts.forceToast) {
-        showToast("Rooms loaded successfully! 🏨");
+        toast.success("Rooms loaded successfully! 🏨");
         loadToastShownRef.current = true;
       }
     } catch (err) {
       console.error(err);
-      showToast("Failed to load rooms", "error");
+      toast.error("Failed to load rooms");
     } finally {
       setLoading(false);
     }
@@ -133,9 +121,9 @@ export default function AdminRoomsPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) return showToast("Image must be <5MB", "error");
+    if (file.size > 5 * 1024 * 1024) return toast.error("Image must be <5MB");
     if (!file.type.startsWith("image/"))
-      return showToast("Invalid image file", "error");
+      return toast.error("Invalid image file");
     setImageFile(file);
     const reader = new FileReader();
     reader.onloadend = () =>
@@ -145,22 +133,22 @@ export default function AdminRoomsPage() {
 
   const handleSaveRoom = async () => {
     if (!currentRoom.alt || !currentRoom.category)
-      return showToast("Please fill all required fields", "error");
+      return toast.error("Please fill all required fields");
 
     try {
       let imageData = currentRoom.src;
 
       if (imageFile) {
-        showToast("Uploading image...", "info");
+        toast.loading("Uploading image...");
         imageData = await uploadToCloudinary(imageFile);
 
         if (!imageData || typeof imageData === "string" || !imageData.url || !imageData.public_id) {
-          return showToast("Failed to upload image to Cloudinary", "error");
+          return toast.error("Failed to upload image to Cloudinary");
         }
       }
 
       if (typeof imageData === "string") {
-        return showToast("Please select and upload an image", "error");
+        return toast.error("Please select and upload an image");
       }
 
       const isEdit = !!(currentRoom._id || currentRoom.id);
@@ -192,13 +180,13 @@ export default function AdminRoomsPage() {
           : [data.room, ...prev]
       );
 
-      showToast(isEdit ? "Room updated! ✅" : "Room added! 🎉");
+      toast.success(isEdit ? "Room updated! ✅" : "Room added! 🎉");
       setEditDialogOpen(false);
       setAddDialogOpen(false);
       setImageFile(null);
     } catch (err) {
       console.error(err);
-      showToast(err instanceof Error ? err.message : "Failed to save room", "error");
+      toast.error(err instanceof Error ? err.message : "Failed to save room");
     }
   };
 
@@ -210,10 +198,10 @@ export default function AdminRoomsPage() {
       });
       if (!res.ok) throw new Error("Failed to delete room");
       setRooms((prev) => prev.filter((r) => r._id !== roomToDelete));
-      showToast("Room deleted!");
+      toast.success("Room deleted!");
     } catch (err) {
       console.error(err);
-      showToast("Failed to delete room", "error");
+      toast.error("Failed to delete room");
     } finally {
       setDeleteDialogOpen(false);
       setRoomToDelete(null);

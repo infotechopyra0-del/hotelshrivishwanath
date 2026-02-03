@@ -9,6 +9,8 @@ export interface ICustomer extends Document {
   role: 'user' | 'admin'
   isVerified: boolean
   emailVerificationToken?: string
+  otpCode?: string
+  otpExpires?: Date
   passwordResetToken?: string
   passwordResetExpires?: Date
   address: {
@@ -83,6 +85,8 @@ const CustomerSchema: Schema = new Schema({
   emailVerificationToken: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  otpCode: String,
+  otpExpires: Date,
   address: {
     street: String,
     city: String,
