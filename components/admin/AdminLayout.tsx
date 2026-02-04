@@ -22,7 +22,6 @@ export default function AdminSidebar() {
     { id: 'galary', label: 'Galary', icon: Star, href: '/admin/dashboard/galary' },
     { id: 'rooms', label: 'Rooms', icon: FolderKanban, href: '/admin/dashboard/rooms' },
     { id: 'faq', label: 'FAQ', icon: MessageSquareQuote, href: '/admin/dashboard/faq' },
-    { id: 'partnersplatforms', label: 'Partners Platforms', icon: Code, href: '/admin/dashboard/partnersplatforms' },
     { id: 'contacts', label: 'Contacts', icon: Sparkles, href: '/admin/dashboard/contacts' },
   ];
 

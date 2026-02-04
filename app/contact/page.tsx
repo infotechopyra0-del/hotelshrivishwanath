@@ -5,6 +5,8 @@ import Hero from '@/components/Hero'
 import ContactForm from '@/components/ContactForm'
 import ContactInfo from '@/components/ContactInfo'
 import MapSection from '@/components/MapSection'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import { Mail, Phone, MapPin } from 'lucide-react'
 
 export default function Contact() {
@@ -32,6 +34,7 @@ export default function Contact() {
   return (
     <PageTransition>
       <main>
+        <Navbar />
         <Hero
           title="Contact Us"
           subtitle="Get in touch with us for bookings, inquiries, and spiritual retreats"
@@ -54,6 +57,7 @@ export default function Contact() {
         </section>
 
         <MapSection />
+        <Footer />
       </main>
     </PageTransition>
   )

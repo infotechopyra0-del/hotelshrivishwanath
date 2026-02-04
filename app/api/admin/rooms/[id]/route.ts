@@ -1,142 +1,175 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/dbConnect';
-import Room from '@/models/Room';
+import { NextRequest, NextResponse } from "next/server";
+import connectDB from "@/lib/dbConnect";
+import Room from "@/models/Room";
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// GET - Fetch single room
+// GET single room by ID
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const room = await Room.findById(params.id);
+    const { id } = await params;
+    
+    const room = await Room.findById(id);
     
     if (!room) {
       return NextResponse.json(
-        { error: 'Room not found' },
+        { success: false, error: "Room not found" },
         { status: 404 }
       );
     }
     
     return NextResponse.json(room, { status: 200 });
   } catch (error: any) {
-    console.error('Error fetching room:', error);
+    console.error("Error fetching room:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch room', message: error.message },
+      { success: false, error: "Failed to fetch room", message: error.message },
       { status: 500 }
     );
   }
 }
 
-// PUT - Update room
+// PUT - Update room by ID
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
+    const { id } = await params;
     const body = await req.json();
-    const { src, alt, category, order, featured } = body;
-    
-    // Find existing room
-    const existingRoom = await Room.findById(params.id);
-    
-    if (!existingRoom) {
-      return NextResponse.json(
-        { success: false, error: 'Room not found' },
-        { status: 404 }
-      );
-    }
-    
+    const {
+      image,
+      title,
+      description,
+      category,
+      price,
+      bedType,
+      maxOccupancy,
+      amenities,
+      status,
+      isAvailable,
+      featured,
+      order,
+    } = body;
+
     // Validation
-    if (!alt || !category) {
+    if (!image) {
       return NextResponse.json(
-        { success: false, error: 'Alt text and category are required' },
+        { success: false, error: "Room image is required" },
         { status: 400 }
       );
     }
-    
-    // If new image is uploaded, delete old one from Cloudinary
-    if (src && src.public_id && src.public_id !== existingRoom.src.public_id) {
-      try {
-        await cloudinary.uploader.destroy(existingRoom.src.public_id);
-      } catch (err) {
-        console.error('Error deleting old image from Cloudinary:', err);
-      }
+
+    if (!title || !description) {
+      return NextResponse.json(
+        { success: false, error: "Title and description are required" },
+        { status: 400 }
+      );
     }
-    
-    // Update room
+
+    if (!category) {
+      return NextResponse.json(
+        { success: false, error: "Category is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!price || price < 0) {
+      return NextResponse.json(
+        { success: false, error: "Valid price is required" },
+        { status: 400 }
+      );
+    }
+
+    // Find and update room
     const updatedRoom = await Room.findByIdAndUpdate(
-      params.id,
+      id,
       {
-        src: src || existingRoom.src,
-        alt,
+        image,
+        title: title.trim(),
+        description: description.trim(),
         category,
-        order: order !== undefined ? order : existingRoom.order,
-        featured: featured !== undefined ? featured : existingRoom.featured
+        price,
+        bedType: bedType || "Double",
+        maxOccupancy: maxOccupancy || 2,
+        amenities: amenities || [],
+        status: status || "ACTIVE",
+        isAvailable: isAvailable !== undefined ? isAvailable : true,
+        featured: featured || false,
+        order: order || 0,
       },
       { new: true, runValidators: true }
     );
-    
+
+    if (!updatedRoom) {
+      return NextResponse.json(
+        { success: false, error: "Room not found" },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(
-      { success: true, room: updatedRoom, message: 'Room updated successfully' },
+      { 
+        success: true, 
+        message: "Room updated successfully", 
+        room: updatedRoom 
+      },
       { status: 200 }
     );
   } catch (error: any) {
-    console.error('Error updating room:', error);
+    console.error("Error updating room:", error);
     return NextResponse.json(
-      { success: false, error: 'Failed to update room', message: error.message },
+      { success: false, error: "Failed to update room", message: error.message },
       { status: 500 }
     );
   }
 }
 
-// DELETE - Delete room
+// DELETE room by ID
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
     
-    const room = await Room.findById(params.id);
+    const { id } = await params;
     
-    if (!room) {
+    const deletedRoom = await Room.findByIdAndDelete(id);
+
+    if (!deletedRoom) {
       return NextResponse.json(
-        { success: false, error: 'Room not found' },
+        { success: false, error: "Room not found" },
         { status: 404 }
       );
     }
-    
-    // Delete image from Cloudinary
-    if (room.src && room.src.public_id) {
-      try {
-        await cloudinary.uploader.destroy(room.src.public_id);
-      } catch (err) {
-        console.error('Error deleting image from Cloudinary:', err);
-      }
+     if (typeof deletedRoom.image === 'object' && deletedRoom.image.public_id) {
+       await cloudinary.uploader.destroy(deletedRoom.image.public_id);
     }
-    
-    await Room.findByIdAndDelete(params.id);
-    
+
     return NextResponse.json(
-      { success: true, message: 'Room deleted successfully' },
+      { 
+        success: true, 
+        message: "Room deleted successfully", 
+        deletedId: id 
+      },
       { status: 200 }
     );
   } catch (error: any) {
-    console.error('Error deleting room:', error);
+    console.error("Error deleting room:", error);
     return NextResponse.json(
-      { success: false, error: 'Failed to delete room', message: error.message },
+      { success: false, error: "Failed to delete room", message: error.message },
       { status: 500 }
     );
   }

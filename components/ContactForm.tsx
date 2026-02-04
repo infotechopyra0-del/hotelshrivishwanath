@@ -3,35 +3,64 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Send } from 'lucide-react'
+import { toast } from 'sonner'
 
 export const ContactForm = () => {
-  const [result, setResult] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    
+    // Prevent double submission
+    if (isSubmitting) {
+      console.log("Form already submitting, preventing double submission")
+      return
+    }
+    
     setIsSubmitting(true)
-    setResult("Sending....")
     
     const formData = new FormData(event.currentTarget)
-    formData.append("access_key", "6d8c4f3f-ff37-41c8-a731-57d3cf98862e")
+    const contactData = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      phone: formData.get('phone') as string,
+      inquiry_type: formData.get('inquiry_type') as string,
+      message: formData.get('message') as string,
+    }
+
+    console.log("Submitting contact form with data:", contactData)
+
+    // Basic validation
+    if (!contactData.name?.trim() || !contactData.email?.trim() || !contactData.message?.trim()) {
+      toast.error("Please fill in all required fields.")
+      setIsSubmitting(false)
+      return
+    }
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      console.log("Making API request...")
+      const response = await fetch("/api/contact", {
         method: "POST",
-        body: formData
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(contactData),
       })
 
+      console.log("API response status:", response.status)
+      
       const data = await response.json()
-      if (data.success) {
-        setResult("Message sent successfully!")
+      console.log("API response data:", data)
+      
+      if (response.ok && data.success) {
+        toast.success("Message sent successfully! We'll get back to you soon.")
         event.currentTarget.reset()
-        setTimeout(() => setResult(""), 5000)
       } else {
-        setResult("Error sending message. Please try again.")
+        toast.error(data.error || "Failed to send message. Please try again.")
       }
-    } catch (error) {
-      setResult("Error sending message. Please try again.")
+    } catch (error: any) {
+      console.error("Contact form error:", error)
+      toast.error("Network error. Please check your connection and try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -50,9 +79,6 @@ export const ContactForm = () => {
       </h2>
 
       <form onSubmit={onSubmit} className="space-y-4">
-        <input type="hidden" name="subject" value="Contact Form Submission - Hotel Shri Vishwanath" />
-        <input type="hidden" name="from_name" value="Hotel Shri Vishwanath Website" />
-
         <div>
           <label className="block text-sm font-medium text-varanasi-maroon mb-2">
             Full Name
@@ -120,22 +146,6 @@ export const ContactForm = () => {
             placeholder="Your message here..."
           />
         </div>
-
-        {result && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`p-4 rounded-lg text-center font-medium ${
-              result.includes("successfully") 
-                ? "bg-green-100 text-green-700 border border-green-200" 
-                : result.includes("Error") 
-                ? "bg-red-100 text-red-700 border border-red-200"
-                : "bg-blue-100 text-blue-700 border border-blue-200"
-            }`}
-          >
-            {result}
-          </motion.div>
-        )}
 
         <motion.button
           type="submit"
