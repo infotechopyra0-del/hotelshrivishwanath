@@ -103,4 +103,4 @@ export const ContactInfo: React.FC<ContactInfoProps> = ({ contactInfo }) => {
   )
 }
 
-export default ContactInfo
+export default ContactInfo;

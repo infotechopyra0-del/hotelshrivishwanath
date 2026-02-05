@@ -198,7 +198,6 @@ const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
             Choose from our carefully curated selection of elegant rooms with Varanasi heritage aesthetics
           </p>
         </motion.div>
-
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -209,7 +208,6 @@ const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
           {displayRooms.map((room, idx) => {
             const roomId = room._id || room.id || `room-${idx}`;
             const imageUrl = typeof room.image === 'string' ? room.image : room.image?.url || '';
-            // Ensure alt is always a string
             const altText = typeof room.title === 'string' && room.title.trim() !== '' ? room.title : `Room ${roomId}`;
             return (
               <motion.div
