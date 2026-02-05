@@ -81,15 +81,18 @@ const AboutSection: React.FC<AboutSectionProps> = ({ full = false }) => {
             </motion.div>
 
             {!full && (
-              <Link href="/about">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-3 bg-gradient-to-r from-varanasi-gold to-varanasi-gold-dark text-varanasi-maroon rounded-full font-semibold hover:shadow-lg hover:shadow-varanasi-gold/50 glow-box-hover"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-block"
+              >
+                <Link 
+                  href="/about"
+                  className="inline-block px-8 py-3 bg-gradient-to-r from-varanasi-gold to-varanasi-gold-dark text-varanasi-maroon rounded-full font-semibold hover:shadow-lg hover:shadow-varanasi-gold/50 glow-box-hover"
                 >
                   Know About Us
-                </motion.button>
-              </Link>
+                </Link>
+              </motion.div>
             )}
           </motion.div>
 

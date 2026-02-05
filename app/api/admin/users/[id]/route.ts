@@ -48,7 +48,6 @@ export async function GET(
 
     return NextResponse.json(user, { status: 200 });
   } catch (error) {
-    console.error('Error fetching user:', error);
     return NextResponse.json(
       { error: 'Failed to fetch user' },
       { status: 500 }
@@ -56,7 +55,6 @@ export async function GET(
   }
 }
 
-// PUT - Update user
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -105,7 +103,6 @@ export async function PUT(
       'profileImage',
     ];
 
-    // Filter out fields that are not allowed to be updated
     const updates: any = {};
     Object.keys(body).forEach((key) => {
       if (allowedUpdates.includes(key)) {
@@ -113,7 +110,6 @@ export async function PUT(
       }
     });
 
-    // Prevent self-demotion (admin changing their own role)
     if (updates.role && session.user.id === id && updates.role !== 'admin') {
       return NextResponse.json(
         { error: 'You cannot demote yourself from admin role' },
@@ -136,7 +132,6 @@ export async function PUT(
 
     return NextResponse.json(user, { status: 200 });
   } catch (error) {
-    console.error('Error updating user:', error);
     return NextResponse.json(
       { error: 'Failed to update user' },
       { status: 500 }
@@ -144,7 +139,6 @@ export async function PUT(
   }
 }
 
-// DELETE - Delete user
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -162,11 +156,7 @@ export async function DELETE(
     await dbConnect();
 
     const { id } = await params;
-
-    console.log('DELETE request for user ID:', id);
-
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.log('Invalid ObjectId provided for deletion:', id);
       return NextResponse.json(
         { error: `Invalid user ID format: ${id}` },
         { status: 400 }
@@ -194,7 +184,6 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error deleting user:', error);
     return NextResponse.json(
       { error: 'Failed to delete user' },
       { status: 500 }

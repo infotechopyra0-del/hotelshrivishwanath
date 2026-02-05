@@ -82,13 +82,18 @@ export default function AdminGalleryPage() {
     try {
       const res = await fetch("/api/admin/gallery", {
         credentials: "include",
-        headers: { Accept: "application/json" },
+        headers: { 
+          Accept: "application/json",
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        },
       });
       if (!res.ok) throw new Error("Failed to fetch images");
       const data: GalleryImage[] = await res.json();
       setImages(data);
     } catch (err) {
-      console.error(err);
+      console.error('Error fetching images:', err);
+      toast.error('Failed to load gallery images');
     } finally {
       setLoading(false);
     }
@@ -216,7 +221,6 @@ export default function AdminGalleryPage() {
       setAddDialogOpen(false);
       await fetchImages();
     } catch (err) {
-      console.error(err);
       toast.error(err instanceof Error ? err.message : "Failed to save image");
     } finally {
       setUploadProgress(false);
@@ -232,7 +236,6 @@ export default function AdminGalleryPage() {
       if (!res.ok) throw new Error("Failed to delete image");
       setImages((prev) => prev.filter((img) => img._id !== imageToDelete));
     } catch (err) {
-      console.error(err);
       toast.error("Failed to delete image");
     } finally {
       setDeleteDialogOpen(false);
@@ -350,11 +353,64 @@ export default function AdminGalleryPage() {
             </div>
 
             {loading && (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-varanasi-gold border-t-transparent"></div>
-                <p className="mt-4 text-gray-600 font-bold text-sm sm:text-base">
-                  Loading images...
-                </p>
+              <div className="space-y-4">
+                {/* Search and Filter Skeleton */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="animate-pulse">
+                    <div className="h-12 bg-gray-200 rounded-xl"></div>
+                  </div>
+                  <div className="animate-pulse">
+                    <div className="h-12 bg-gray-200 rounded-xl"></div>
+                  </div>
+                </div>
+
+                {/* Table Skeleton */}
+                <div className="bg-white rounded-xl border-2 border-varanasi-gold overflow-hidden shadow-lg">
+                  {/* Table Header */}
+                  <div className="bg-gradient-to-r from-varanasi-maroon to-varanasi-maroon-dark px-4 py-4">
+                    <div className="grid grid-cols-6 gap-4">
+                      <div className="h-4 bg-varanasi-gold/30 rounded"></div>
+                      <div className="h-4 bg-varanasi-gold/30 rounded"></div>
+                      <div className="h-4 bg-varanasi-gold/30 rounded"></div>
+                      <div className="h-4 bg-varanasi-gold/30 rounded"></div>
+                      <div className="h-4 bg-varanasi-gold/30 rounded"></div>
+                      <div className="h-4 bg-varanasi-gold/30 rounded"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Table Rows Skeleton */}
+                  <div className="divide-y divide-varanasi-gold/30">
+                    {[...Array(6)].map((_, index) => (
+                      <div key={index} className="px-4 py-4 animate-pulse">
+                        <div className="grid grid-cols-6 gap-4 items-center">
+                          <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+                          <div className="space-y-2">
+                            <div className={`h-4 bg-gray-200 rounded ${
+                              index === 0 ? 'w-3/4' :
+                              index === 1 ? 'w-full' :
+                              index === 2 ? 'w-5/6' :
+                              index === 3 ? 'w-4/5' :
+                              index === 4 ? 'w-2/3' : 'w-3/4'
+                            }`}></div>
+                          </div>
+                          <div className="w-16 h-6 bg-gray-200 rounded-full"></div>
+                          <div className="w-5 h-5 bg-gray-200 rounded mx-auto"></div>
+                          <div className="w-20 h-4 bg-gray-200 rounded"></div>
+                          <div className="flex gap-2 justify-center">
+                            <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                            <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="text-center py-4">
+                  <p className="text-varanasi-brown font-semibold text-sm animate-pulse">
+                    Loading gallery images...
+                  </p>
+                </div>
               </div>
             )}
 
@@ -373,7 +429,6 @@ export default function AdminGalleryPage() {
                 </p>
               </div>
             )}
-
             {!loading && filteredImages.length > 0 && (
               <div className="overflow-x-auto">
                 <table className="w-full bg-white rounded-xl border-2 border-varanasi-gold overflow-hidden shadow-lg">

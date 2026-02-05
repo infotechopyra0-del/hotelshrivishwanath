@@ -88,9 +88,13 @@ const LoginPage = () => {
             duration: 3000,
           })
 
-          // Redirect based on role
+          // Redirect based on role or previous page
           setTimeout(() => {
-            if (session.user.role === 'admin') {
+            // Check if there's a saved room for booking
+            const savedRoom = localStorage.getItem('selectedRoom')
+            if (savedRoom && session.user.role !== 'admin') {
+              router.push('/checkout')
+            } else if (session.user.role === 'admin') {
               router.push('/admin/dashboard')
             } else {
               router.push('/')

@@ -7,10 +7,7 @@ import { sendOTPEmail } from '@/lib/mailer'
 export async function POST(request: NextRequest) {
   try {
     await dbConnect()
-    
     const { fullName, email, password } = await request.json()
-
-    // Validation
     if (!fullName || !email || !password) {
       return NextResponse.json(
         { message: 'All fields are required' },
@@ -25,7 +22,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -34,7 +30,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if email is from Gmail (real Gmail verification)
     if (!email.toLowerCase().endsWith('@gmail.com')) {
       return NextResponse.json(
         { message: 'Invalid Email Id' },
@@ -49,7 +44,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user already exists
     const existingUser = await Customer.findOne({ email: email.toLowerCase() })
     if (existingUser) {
       return NextResponse.json(
@@ -58,30 +52,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Hash password
     const hashedPassword = await bcryptjs.hash(password, 12)
-
-    // Create new user (unverified until OTP is validated)
     const newUser = new Customer({
       name: fullName,
       email: email.toLowerCase(),
       password: hashedPassword,
-      role: 'user', // Always set to user by default
+      role: 'user',
       isVerified: false,
     })
 
-    // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString()
     newUser.otpCode = otp
-    newUser.otpExpires = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+    newUser.otpExpires = new Date(Date.now() + 10 * 60 * 1000)
 
     await newUser.save()
 
-    // Send OTP email (fire-and-forget; log errors)
     try {
       await sendOTPEmail(newUser.email, otp)
     } catch (err) {
-      console.error('Failed to send OTP email:', err)
     }
 
     return NextResponse.json(
@@ -98,7 +86,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
   } catch (error) {
-    console.error('Signup error:', error)
     return NextResponse.json(
       { message: 'Internal server error' },
       { status: 500 }

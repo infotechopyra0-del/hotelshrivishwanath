@@ -1,12 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear()
+  const [currentYear, setCurrentYear] = useState<number | null>(null)
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear())
+  }, [])
   const [newsletterResult, setNewsletterResult] = useState('')
 
   const footerLinks = [
@@ -95,8 +99,22 @@ const Footer = () => {
             <p className="text-sm text-varanasi-cream/85 mb-3">Subscribe to our newsletter for offers and updates.</p>
 
             <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-2">
-              <input aria-label="email" type="email" name="email" required placeholder="Your email" className="px-3 py-2 rounded-md bg-varanasi-maroon/70 placeholder-varanasi-cream/60 text-varanasi-cream text-sm border border-varanasi-gold/20 focus:outline-none" />
-              <button type="submit" className="px-4 py-2 bg-varanasi-gold text-varanasi-maroon rounded-md font-semibold text-sm">Subscribe</button>
+              <input 
+                aria-label="email" 
+                type="email" 
+                name="email" 
+                required 
+                placeholder="Your email" 
+                className="px-3 py-2 rounded-md bg-varanasi-maroon/70 placeholder-varanasi-cream/60 text-varanasi-cream text-sm border border-varanasi-gold/20 focus:outline-none"
+                suppressHydrationWarning
+              />
+              <button 
+                type="submit" 
+                className="px-4 py-2 bg-varanasi-gold text-varanasi-maroon rounded-md font-semibold text-sm"
+                suppressHydrationWarning
+              >
+                Subscribe
+              </button>
             </form>
             {newsletterResult && <p className="text-xs mt-3 text-varanasi-cream/70">{newsletterResult}</p>}
 
@@ -115,7 +133,7 @@ const Footer = () => {
 
         <motion.div variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true }} className="border-t border-varanasi-gold/20 pt-6 text-sm text-varanasi-cream/70">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3">
-            <p>© {currentYear} Hotel Shri Vishwanath. All rights reserved.</p>
+            <p>© {currentYear ? currentYear : ''} Hotel Shri Vishwanath. All rights reserved.</p>
             <p className="text-xs">D 53/88 H, Luxa Road, Varanasi, UP 221010</p>
           </div>
         </motion.div>

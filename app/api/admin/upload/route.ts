@@ -4,13 +4,6 @@ import { v2 as cloudinary } from 'cloudinary';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-	console.error('Missing Cloudinary configuration:', {
-		cloud_name: !!process.env.CLOUDINARY_CLOUD_NAME,
-		api_key: !!process.env.CLOUDINARY_API_KEY,
-		api_secret: !!process.env.CLOUDINARY_API_SECRET
-	});
-}
 
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -30,7 +23,6 @@ export async function POST(request: Request) {
 		}
 
 		if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-			console.error('Cloudinary configuration missing');
 			return NextResponse.json(
 				{ error: 'Server configuration error. Please contact administrator.' },
 				{ status: 500 }
@@ -44,31 +36,27 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: 'No file uploaded.' }, { status: 400 });
 		}
 
-		// Read file as buffer
 		const arrayBuffer = await file.arrayBuffer();
 		const buffer = Buffer.from(arrayBuffer);
-
-		// Upload to Cloudinary with proper error handling and timeout
 		const uploadResult = await new Promise<{ secure_url: string; public_id: string }>((resolve, reject) => {
 			const uploadTimeout = setTimeout(() => {
 				reject(new Error('Upload timeout - file may be too large or connection is slow'));
-			}, 60000); // 60 second timeout
+			}, 60000);
 
 			const stream = cloudinary.uploader.upload_stream(
 				{ 
 					resource_type: 'image',
-					folder: 'hotel-gallery', // organize uploads in folder
+					folder: 'hotel-gallery',
 					transformation: [
-						{ width: 1920, height: 1080, crop: 'limit' }, // limit max size
-						{ quality: 'auto:good' }, // optimize quality
-						{ format: 'auto' } // auto format selection
+						{ width: 1920, height: 1080, crop: 'limit' }, 
+						{ quality: 'auto:good' },
+						{ format: 'auto' } 
 					]
 				}, 
 				(error, result) => {
 					clearTimeout(uploadTimeout);
 					
 					if (error) {
-						console.error('Cloudinary upload error details:', error);
 						reject(new Error(`Cloudinary upload failed: ${error.message}`));
 						return;
 					}
@@ -93,15 +81,7 @@ export async function POST(request: Request) {
 			publicId: uploadResult.public_id 
 		});
 	} catch (error: any) {
-		console.error('Cloudinary upload error:', {
-			message: error.message,
-			http_code: error.http_code,
-			name: error.name,
-			stack: error.stack
-		});
-		
-		// Handle specific Cloudinary errors
-		if (error.http_code === 401) {
+			if (error.http_code === 401) {
 			return NextResponse.json(
 				{ error: 'Cloudinary authentication failed. Please check API credentials.' },
 				{ status: 500 }

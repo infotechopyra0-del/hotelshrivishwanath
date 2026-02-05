@@ -50,7 +50,6 @@ export async function GET(
       { status: 200 }
     )
   } catch (error: any) {
-    console.error('Error fetching booking:', error)
     return NextResponse.json(
       {
         success: false,
@@ -120,7 +119,6 @@ export async function PATCH(
       { status: 200 }
     )
   } catch (error: any) {
-    console.error('Error cancelling booking:', error)
     return NextResponse.json(
       {
         success: false,

@@ -124,7 +124,6 @@ export default function AdminBookingsPage() {
         loadToastShownRef.current = true;
       }
     } catch (error) {
-      console.error("Error fetching bookings:", error);
     } finally {
       setLoading(false);
     }
@@ -162,7 +161,6 @@ export default function AdminBookingsPage() {
 
       setBookings((prev) => prev.filter((b) => b._id !== bookingToDelete));
     } catch (error) {
-      console.error("Error deleting booking:", error);
     } finally {
       setDeleteDialogOpen(false);
       setBookingToDelete(null);
@@ -192,7 +190,6 @@ export default function AdminBookingsPage() {
         prev.map((b) => (b._id === id ? updatedBooking : b))
       );
     } catch (error) {
-      console.error("Error updating booking:", error);
     }
   };
 
@@ -214,7 +211,6 @@ export default function AdminBookingsPage() {
         prev.map((b) => (b._id === id ? updatedBooking : b))
       );
     } catch (error) {
-      console.error("Error updating payment:", error);
     }
   };
 

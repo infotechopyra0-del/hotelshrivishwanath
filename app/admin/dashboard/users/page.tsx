@@ -102,7 +102,6 @@ export default function AdminUsersPage() {
         loadToastShownRef.current = true;
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
     }
@@ -123,9 +122,6 @@ export default function AdminUsersPage() {
 
   const handleDeleteClick = (id: string) => {
     if (!id || id.startsWith('user-')) {
-      console.error('Cannot delete user with invalid ID:', id);
-      // You might want to show a toast notification here instead of alert
-      console.warn('Cannot delete user: Invalid user ID');
       return;
     }
     setUserToDelete(id);
@@ -140,23 +136,16 @@ export default function AdminUsersPage() {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || `Failed to delete user: ${response.status} ${response.statusText}`);
       }
-
       const result = await response.json();
-      console.log(result.message); // Success message
-
       setUsers((prev) =>
         prev.filter((u) => (u.id ?? u._id) !== userToDelete)
       );
     } catch (error: any) {
-      console.error("Error deleting user:", error);
-      // You might want to show a toast notification here
       const errorMessage = error.message || 'Unknown error occurred';
-      console.error(`Failed to delete user: ${errorMessage}`);
     } finally {
       setDeleteDialogOpen(false);
       setUserToDelete(null);
@@ -187,7 +176,6 @@ export default function AdminUsersPage() {
         prev.map((u) => ((u.id ?? u._id) === id ? updatedUser : u))
       );
     } catch (error) {
-      console.error("Error updating user:", error);
     }
   };
 
@@ -211,7 +199,6 @@ export default function AdminUsersPage() {
         prev.map((u) => ((u.id ?? u._id) === id ? updatedUser : u))
       );
     } catch (error) {
-      console.error("Error updating role:", error);
     }
   };
 
@@ -342,7 +329,6 @@ export default function AdminUsersPage() {
                   {filteredUsers.map((user: User, index: number) => {
                     const uid = user._id || user.id;
                     if (!uid) {
-                      console.error('User missing valid ID:', user);
                       return null;
                     }
                     const tier = getTierBadge(user.totalSpent);
@@ -457,7 +443,6 @@ export default function AdminUsersPage() {
                     {filteredUsers.map((user: User, index: number) => {
                       const uid = user._id || user.id;
                       if (!uid) {
-                        console.error('User missing valid ID:', user);
                         return null;
                       }
                       const tier = getTierBadge(user.totalSpent);
@@ -558,7 +543,6 @@ export default function AdminUsersPage() {
                       {filteredUsers.map((user: User, index: number) => {
                         const uid = user._id || user.id;
                         if (!uid) {
-                          console.error('User missing valid ID:', user);
                           return null;
                         }
                         const tier = getTierBadge(user.totalSpent);

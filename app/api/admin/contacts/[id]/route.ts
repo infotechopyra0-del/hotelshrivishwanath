@@ -36,7 +36,6 @@ export async function PUT(
 
     return NextResponse.json(updatedContact, { status: 200 });
   } catch (error: any) {
-    console.error("Error updating contact:", error);
     return NextResponse.json(
       { error: "Failed to update contact" },
       { status: 500 }
@@ -74,7 +73,6 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Error deleting contact:", error);
     return NextResponse.json(
       { error: "Failed to delete contact" },
       { status: 500 }

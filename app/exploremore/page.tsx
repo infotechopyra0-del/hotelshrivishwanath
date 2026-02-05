@@ -2,6 +2,8 @@
 
 import PageTransition from '@/components/PageTransition'
 import Hero from '@/components/Hero'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { MapPin, Clock, Users, Star, Camera, Waves, Building, Utensils } from 'lucide-react'
@@ -113,6 +115,7 @@ export default function ExploreMore() {
   return (
     <PageTransition>
       <main>
+        <Navbar />
         <Hero
           title="Explore More"
           subtitle="Discover the spiritual heart of Varanasi and create unforgettable memories around our hotel"
@@ -124,7 +127,6 @@ export default function ExploreMore() {
             '/images/ThatheriBazaar.png'
           ]}
         />
-
         {/* Nearby Attractions */}
         <section className="py-20 md:py-28 bg-gradient-to-b from-white to-varanasi-cream/20">
           <div className="container-custom">
@@ -304,6 +306,7 @@ export default function ExploreMore() {
             </motion.div>
           </div>
         </section>
+        <Footer />
       </main>
     </PageTransition>
   )

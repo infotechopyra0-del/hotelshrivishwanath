@@ -33,15 +33,8 @@ export default function WhatsAppChat() {
               exit={{ scale: 0, opacity: 0 }}
             >
               <MessageCircle className="w-7 h-7 text-white" />
-              
               {/* Pulse Animation */}
               <div className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75"></div>
-              
-              {/* Tooltip */}
-              <div className="absolute right-16 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white text-sm px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                Chat with us on WhatsApp
-                <div className="absolute left-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-l-gray-800"></div>
-              </div>
             </motion.button>
           )}
         </AnimatePresence>

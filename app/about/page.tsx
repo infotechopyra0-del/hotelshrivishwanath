@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion'
 import PageTransition from '@/components/PageTransition'
 import Hero from '@/components/Hero'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 import AboutSection from '@/components/AboutSection'
 import { Utensils, Users, Award, Droplets } from 'lucide-react'
 
@@ -46,6 +48,7 @@ export default function About() {
   return (
     <PageTransition>
       <main>
+        <Navbar />
         <Hero
         title="About Our Hotel"
         subtitle="Discover the story of excellence, tradition, and spiritual elegance rooted in Varanasi"
@@ -150,6 +153,7 @@ export default function About() {
           </motion.div>
         </div>
       </section>
+      <Footer />
       </main>
     </PageTransition>
   )

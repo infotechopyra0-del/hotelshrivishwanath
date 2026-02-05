@@ -59,7 +59,6 @@ export async function PUT(
       { status: 200 }
     );
   } catch (error: any) {
-    console.error('Error updating gallery image:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update image' },
       { status: 500 }
@@ -105,7 +104,6 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error: any) {
-    console.error('Error deleting gallery image:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to delete image' },
       { status: 500 }

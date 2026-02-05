@@ -39,7 +39,6 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     )
   } catch (error: any) {
-    console.error('Error fetching upcoming bookings:', error)
     return NextResponse.json(
       {
         success: false,

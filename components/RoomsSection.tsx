@@ -1,61 +1,54 @@
 'use client'
-
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Star, Users, DoorOpen } from 'lucide-react'
+import { Users, Bed } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 interface Room {
-  id: number
-  name: string
-  price: number
+  _id?: string
+  id?: string
+  image: { url: string; public_id: string } | string
+  title: string
   description: string
-  image: string
-  features: string[]
-  rating: number
-  reviews: number
+  category: string
+  price: number
+  bedType: string
+  maxOccupancy: number
+  amenities: string[]
+  featured: boolean
 }
 
-interface RoomsSectionProps {
-  rooms?: Room[]
-  showAll?: boolean
-}
+const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
+  const [rooms, setRooms] = useState<Room[]>([])
+  const [loading, setLoading] = useState(true)
 
-const RoomsSection: React.FC<RoomsSectionProps> = ({ 
-  rooms = [
-    {
-      id: 1,
-      name: 'Standard Room',
-      price: 2000,
-      description: 'Includes the essential amenities needed for a comfortable stay with warm Varanasi-inspired interiors.',
-      image: '/images/Rooms1.jpg',
-      features: ['Free WiFi', 'AC', 'Private Bathroom', 'TV'],
-      rating: 4.5,
-      reviews: 128,
-    },
-    {
-      id: 2,
-      name: 'Deluxe Room',
-      price: 2500,
-      description: 'Designed to offer upgraded comfort with elegant Varanasi heritage decor and modern amenities.',
-      image: '/images/Rooms3.jpg',
-      features: ['Free WiFi', 'AC', 'Work Desk', 'Room Service'],
-      rating: 4.8,
-      reviews: 245,
-    },
-    {
-      id: 3,
-      name: 'Super deluxe Room',
-      price: 3500,
-      description: 'Experience luxury with spacious premium suite featuring royal Banarasi aesthetics and exclusive amenities.',
-      image: '/images/Rooms2.jpg',
-      features: ['Free WiFi', 'Living Area', 'Premium Toiletries', 'Ganga View'],
-      rating: 5.0,
-      reviews: 89,
+  useEffect(() => {
+    fetchRooms()
+  }, [])
+
+  const fetchRooms = async () => {
+    try {
+      const res = await fetch('/api/rooms')
+      if (!res.ok) throw new Error('Failed to fetch rooms')
+      const data: Room[] = await res.json()
+      
+      // Sort by featured status
+      const sortedData = data.sort((a, b) => {
+        if (a.featured && !b.featured) return -1
+        if (!a.featured && b.featured) return 1
+        return 0
+      })
+      
+      setRooms(sortedData)
+    } catch (error) {
+      console.error('Error fetching rooms:', error)
+      setRooms([])
+    } finally {
+      setLoading(false)
     }
-  ],
-  showAll = false,
-}) => {
+  }
+
   const displayRooms = showAll ? rooms : rooms.slice(0, 3)
 
   const containerVariants = {
@@ -69,6 +62,122 @@ const RoomsSection: React.FC<RoomsSectionProps> = ({
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0 },
+  }
+
+  if (loading) {
+    return (
+      <section className="py-20 md:py-28 bg-gradient-to-b from-varanasi-cream via-varanasi-cream to-varanasi-cream-dark">
+        <div className="container-custom">
+          {/* Header Skeleton */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-20"
+          >
+            <div className="w-16 h-6 bg-varanasi-gold/20 rounded mx-auto mb-3 animate-pulse" />
+            <div className="space-y-3 mb-6">
+              <div className="w-80 h-12 bg-varanasi-gold/10 rounded mx-auto animate-pulse" />
+              <div className="w-64 h-8 bg-varanasi-gold/10 rounded mx-auto animate-pulse" />
+            </div>
+            <div className="space-y-2">
+              <div className="w-96 h-5 bg-varanasi-gold/10 rounded mx-auto animate-pulse" />
+              <div className="w-80 h-5 bg-varanasi-gold/10 rounded mx-auto animate-pulse" />
+            </div>
+          </motion.div>
+
+          {/* Rooms Grid Skeleton */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {[...Array(showAll ? 6 : 3)].map((_, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 * idx }}
+                className="rounded-2xl overflow-hidden bg-white shadow-xl border-2 border-varanasi-gold/20"
+              >
+                {/* Image Skeleton */}
+                <div className="relative h-64 bg-varanasi-gold/10 animate-pulse overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-varanasi-gold/5 via-varanasi-gold/10 to-varanasi-gold/5 animate-shimmer" />
+                  {/* Featured Badge Skeleton */}
+                  {idx === 0 && (
+                    <div className="absolute top-4 right-4 w-20 h-6 bg-varanasi-gold/20 rounded-full animate-pulse" />
+                  )}
+                </div>
+
+                {/* Content Skeleton */}
+                <div className="p-6">
+                  {/* Category Badge Skeleton */}
+                  <div className="mb-3">
+                    <div className="w-20 h-6 bg-varanasi-gold/20 rounded-full animate-pulse" />
+                  </div>
+
+                  {/* Title Skeleton */}
+                  <div className="space-y-2 mb-3">
+                    <div className={`h-7 bg-varanasi-gold/10 rounded animate-pulse ${idx % 3 === 0 ? 'w-3/4' : idx % 3 === 1 ? 'w-5/6' : 'w-2/3'}`} />
+                    <div className={`h-6 bg-varanasi-gold/10 rounded animate-pulse ${idx % 3 === 0 ? 'w-1/2' : idx % 3 === 1 ? 'w-2/3' : 'w-3/4'}`} />
+                  </div>
+
+                  {/* Description Skeleton */}
+                  <div className="space-y-2 mb-4">
+                    <div className="w-full h-4 bg-varanasi-gold/10 rounded animate-pulse" />
+                    <div className="w-4/5 h-4 bg-varanasi-gold/10 rounded animate-pulse" />
+                  </div>
+
+                  {/* Room Info Skeleton */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 bg-varanasi-gold/20 rounded animate-pulse" />
+                      <div className="w-12 h-4 bg-varanasi-gold/10 rounded animate-pulse" />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="w-4 h-4 bg-varanasi-gold/20 rounded animate-pulse" />
+                      <div className="w-16 h-4 bg-varanasi-gold/10 rounded animate-pulse" />
+                    </div>
+                  </div>
+
+                  {/* Amenities Skeleton */}
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    {[...Array(4)].map((_, amenityIdx) => (
+                      <div key={amenityIdx} className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-varanasi-gold/20 animate-pulse" />
+                        <div className={`h-3 bg-varanasi-gold/10 rounded animate-pulse ${amenityIdx % 2 === 0 ? 'w-16' : 'w-14'}`} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer Skeleton */}
+                  <div className="flex justify-between items-center pt-4 border-t border-varanasi-gold/10">
+                    <div>
+                      <div className="w-8 h-3 bg-varanasi-gold/10 rounded animate-pulse mb-1" />
+                      <div className="w-20 h-8 bg-varanasi-gold/20 rounded animate-pulse" />
+                    </div>
+                    <div className="w-24 h-8 bg-varanasi-gold/20 rounded-full animate-pulse" />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* View All Button Skeleton */}
+          {!showAll && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-center mt-12"
+            >
+              <div className="w-32 h-10 bg-varanasi-gold/10 rounded-full animate-pulse mx-auto" />
+            </motion.div>
+          )}
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -97,83 +206,95 @@ const RoomsSection: React.FC<RoomsSectionProps> = ({
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {displayRooms.map((room) => {
-            // Generate WhatsApp message based on room type
-            const getWhatsAppMessage = () => {
-              if (room.name === 'Standard Room') {
-                return `Hello!%20I%27m%20interested%20in%20booking%20a%20Standard%20Room%20at%20Hotel%20Shri%20Vishwanath.%20Could%20you%20please%20help%20me%20with%20availability%20and%20pricing%20for%20₹2,000%20per%20night%3F`
-              } else if (room.name === 'Deluxe Room') {
-                return `Hello!%20I%27m%20interested%20in%20booking%20a%20Deluxe%20Room%20at%20Hotel%20Shri%20Vishwanath.%20Could%20you%20please%20help%20me%20with%20availability%20and%20pricing%20for%20₹2,500%20per%20night%3F`
-              } else if (room.name === 'Super deluxe Room') {
-                return `Hello!%20I%27m%20interested%20in%20booking%20a%20Super%20Deluxe%20Room%20(Premium%20Suite)%20at%20Hotel%20Shri%20Vishwanath.%20Could%20you%20please%20help%20me%20with%20availability%20and%20VIP%20pricing%20for%20₹3,500%20per%20night%3F`
-              }
-              return `Hello!%20I%27m%20interested%20in%20booking%20a%20room%20at%20Hotel%20Shri%20Vishwanath.%20Could%20you%20please%20help%20me%20with%20availability%20and%20pricing%3F`
-            }
-            
+          {displayRooms.map((room, idx) => {
+            const roomId = room._id || room.id || `room-${idx}`;
+            const imageUrl = typeof room.image === 'string' ? room.image : room.image?.url || '';
+            // Ensure alt is always a string
+            const altText = typeof room.title === 'string' && room.title.trim() !== '' ? room.title : `Room ${roomId}`;
             return (
               <motion.div
-                key={room.id}
+                key={String(roomId)}
                 variants={itemVariants}
                 whileHover={{ y: -20, boxShadow: '0 25px 50px rgba(232, 185, 35, 0.25)' }}
                 className="group rounded-2xl overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-varanasi-gold/20 hover:border-varanasi-gold/50"
               >
                 {/* Image Container */}
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src={room.image}
-                    alt={room.name}
-                    fill
-                    className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-varanasi-maroon/20 group-hover:to-varanasi-maroon/40 transition-colors duration-300" />
-                </div>
+                <Link href={`/rooms/${roomId}`}>
+                  <div className="relative h-64 overflow-hidden cursor-pointer">
+                    <Image
+                      src={imageUrl}
+                      alt={altText}
+                      fill
+                      className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                    />
+                    {room.featured && (
+                      <div className="absolute top-4 right-4 bg-varanasi-gold text-varanasi-maroon px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                        ⭐ Featured
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-varanasi-maroon/20 group-hover:to-varanasi-maroon/40 transition-colors duration-300" />
+                  </div>
+                </Link>
 
                 {/* Content */}
                 <div className="p-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="font-serif text-2xl font-bold text-varanasi-maroon">
-                      {room.name}
-                    </h3>
-                    <div className="flex items-center gap-1 bg-varanasi-gold/10 px-3 py-1 rounded-full border border-varanasi-gold/30">
-                      <Star className="w-4 h-4 fill-varanasi-gold text-varanasi-gold" />
-                      <span className="text-sm font-semibold text-varanasi-gold">
-                        {room.rating}
-                      </span>
-                    </div>
+                  <div className="mb-3">
+                    <span className="inline-block bg-varanasi-gold/20 text-varanasi-maroon px-3 py-1 rounded-full text-xs font-bold border border-varanasi-gold/30">
+                      {room.category}
+                    </span>
                   </div>
+
+                  <Link href={`/rooms/${roomId}`}>
+                    <h3 className="font-serif text-2xl font-bold text-varanasi-maroon hover:text-varanasi-gold transition-colors cursor-pointer mb-3">
+                      {room.title}
+                    </h3>
+                  </Link>
 
                   <p className="text-varanasi-brown text-sm mb-4 line-clamp-2">
                     {room.description}
                   </p>
 
-                  {/* Features */}
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    {room.features.slice(0, 4).map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-xs text-varanasi-brown">
-                        <div className="w-1.5 h-1.5 rounded-full bg-varanasi-gold" />
-                        {feature}
-                      </div>
-                    ))}
+                  {/* Room Info */}
+                  <div className="flex items-center gap-4 mb-4 text-xs text-varanasi-brown">
+                    <div className="flex items-center gap-1">
+                      <Users size={14} className="text-varanasi-gold" />
+                      <span>{room.maxOccupancy} Guests</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Bed size={14} className="text-varanasi-gold" />
+                      <span>{room.bedType}</span>
+                    </div>
                   </div>
+
+                  {/* Features */}
+                  {room.amenities && room.amenities.length > 0 && (
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      {room.amenities.slice(0, 4).map((amenity, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-xs text-varanasi-brown">
+                          <div className="w-1.5 h-1.5 rounded-full bg-varanasi-gold" />
+                          {amenity}
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Footer */}
                   <div className="flex justify-between items-center pt-4 border-t border-varanasi-gold/10">
                     <div>
                       <p className="text-xs text-varanasi-brown">From</p>
                       <p className="font-serif text-2xl font-bold text-varanasi-gold">
-                        ₹{room.price}
+                        ₹{room.price.toLocaleString()}
                       </p>
                     </div>
-                    <motion.a
-                      href={`https://wa.me/916390057777?text=${getWhatsAppMessage()}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-6 py-2 bg-gradient-to-r from-varanasi-gold to-varanasi-gold-dark text-varanasi-maroon rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-varanasi-gold/50 glow-box-hover transition-all"
-                    >
-                      Book Now
-                    </motion.a>
+                    <Link href={`/rooms/${roomId}`}>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="px-6 py-2 bg-gradient-to-r from-varanasi-gold to-varanasi-gold-dark text-varanasi-maroon rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-varanasi-gold/50 glow-box-hover transition-all"
+                      >
+                        View Details
+                      </motion.button>
+                    </Link>
                   </div>
                 </div>
               </motion.div>
@@ -181,7 +302,7 @@ const RoomsSection: React.FC<RoomsSectionProps> = ({
           })}
         </motion.div>
 
-        {!showAll && (
+        {!showAll && rooms.length > 3 && (
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}

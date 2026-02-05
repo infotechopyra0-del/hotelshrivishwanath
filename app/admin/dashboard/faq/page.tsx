@@ -70,7 +70,6 @@ export default function AdminFAQPage() {
       const data: FAQ[] = await res.json();
       setFaqs(data);
     } catch (err) {
-      console.error(err);
       toast.error("Failed to load FAQs");
     } finally {
       setLoading(false);

@@ -13,12 +13,10 @@ export async function GET() {
         { status: 401 }
       );
     }
-
     await dbConnect();
     const faqs = await FAQ.find().sort({ createdAt: -1 });
     return NextResponse.json(faqs);
   } catch (error: any) {
-    console.error('Error fetching FAQs:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch FAQs' },
       { status: 500 }
@@ -59,7 +57,6 @@ export async function POST(req: NextRequest) {
       message: 'FAQ created successfully',
     });
   } catch (error: any) {
-    console.error('Error creating FAQ:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to create FAQ' },
       { status: 500 }

@@ -1,9 +1,7 @@
 'use client'
-
 import PageTransition from '@/components/PageTransition'
 import Hero from '@/components/Hero'
 import GallerySection from '@/components/GallerySection'
-import RoomsImageSection from '@/components/RoomsImageSection'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
@@ -23,7 +21,6 @@ export default function Gallery() {
             '/images/GodowliaMarket.png'
           ]}
         />
-        <RoomsImageSection showAll={true} limit={999} />
         <GallerySection showAll={true} limit={999} />
         <Footer />
       </main>

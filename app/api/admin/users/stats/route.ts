@@ -4,10 +4,8 @@ import Customer from '@/models/Customer';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-// GET - Fetch user statistics for admin dashboard
 export async function GET(req: NextRequest) {
   try {
-    // Check authentication and admin role
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== 'admin') {
@@ -19,7 +17,6 @@ export async function GET(req: NextRequest) {
 
     await dbConnect();
 
-    // Get various statistics
     const [
       totalUsers,
       activeUsers,
@@ -64,21 +61,17 @@ export async function GET(req: NextRequest) {
       ]),
     ]);
 
-    // Get top spending customers
     const topCustomers = await Customer.find({ status: { $ne: 'Blacklisted' } })
       .select('name email totalSpent totalBookings loyaltyPoints status')
       .sort({ totalSpent: -1 })
       .limit(10)
       .lean();
 
-    // Get recently joined users
     const recentUsers = await Customer.find({})
       .select('name email status createdAt')
       .sort({ createdAt: -1 })
       .limit(10)
       .lean();
-
-    // Get users by registration trend (last 6 months)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
@@ -136,7 +129,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(stats, { status: 200 });
   } catch (error) {
-    console.error('Error fetching user statistics:', error);
     return NextResponse.json(
       { error: 'Failed to fetch statistics' },
       { status: 500 }

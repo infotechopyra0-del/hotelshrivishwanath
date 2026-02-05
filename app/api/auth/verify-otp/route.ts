@@ -36,7 +36,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: 'Email verified successfully' }, { status: 200 })
   } catch (error) {
-    console.error('Verify OTP error:', error)
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
   }
 }

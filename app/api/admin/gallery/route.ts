@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(images, { status: 200 });
   } catch (error: any) {
-    console.error('Error fetching gallery images:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch images' },
       { status: 500 }
@@ -53,7 +52,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error('Error creating gallery image:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to create image' },
       { status: 500 }

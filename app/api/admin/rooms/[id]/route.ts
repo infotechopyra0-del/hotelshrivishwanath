@@ -9,7 +9,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// GET single room by ID
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -30,7 +29,6 @@ export async function GET(
     
     return NextResponse.json(room, { status: 200 });
   } catch (error: any) {
-    console.error("Error fetching room:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch room", message: error.message },
       { status: 500 }
@@ -128,7 +126,6 @@ export async function PUT(
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Error updating room:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update room", message: error.message },
       { status: 500 }
@@ -167,7 +164,6 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Error deleting room:", error);
     return NextResponse.json(
       { success: false, error: "Failed to delete room", message: error.message },
       { status: 500 }

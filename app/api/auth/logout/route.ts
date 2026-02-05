@@ -5,14 +5,11 @@ import { authOptions } from '@/lib/auth'
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    
-    // Create response for logout
     const response = NextResponse.json(
       { message: 'Logout successful', redirect: '/' },
       { status: 200 }
     )
 
-    // Clear all NextAuth cookies
     const cookiesToClear = [
       'next-auth.session-token',
       'next-auth.csrf-token',
@@ -32,7 +29,6 @@ export async function POST(request: NextRequest) {
       })
     })
 
-    // Also clear without httpOnly for client-side cookies
     response.cookies.set('userEmail', '', {
       expires: new Date(0),
       path: '/',
@@ -42,13 +38,10 @@ export async function POST(request: NextRequest) {
 
     return response
   } catch (error) {
-    console.error('Logout error:', error)
     const response = NextResponse.json(
       { message: 'Logout completed', redirect: '/' },
       { status: 200 }
     )
-    
-    // Still clear cookies even if there's an error
     const cookiesToClear = [
       'next-auth.session-token',
       'next-auth.csrf-token',

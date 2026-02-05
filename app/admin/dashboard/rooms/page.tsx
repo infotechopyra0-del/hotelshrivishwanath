@@ -119,7 +119,6 @@ export default function AdminRoomsManagement() {
       setRooms(data);
       toast.success("Rooms loaded successfully! 🏨");
     } catch (err) {
-      console.error(err);
       toast.error("Failed to load rooms");
     } finally {
       setLoading(false);

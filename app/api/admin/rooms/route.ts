@@ -12,7 +12,6 @@ export async function GET(req: NextRequest) {
     
     return NextResponse.json(rooms, { status: 200 });
   } catch (error: any) {
-    console.error("Error fetching rooms:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch rooms", message: error.message },
       { status: 500 }
@@ -95,7 +94,6 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Error creating room:", error);
     return NextResponse.json(
       { success: false, error: "Failed to create room", message: error.message },
       { status: 500 }

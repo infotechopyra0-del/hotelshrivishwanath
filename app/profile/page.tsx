@@ -13,6 +13,7 @@ export default function ProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [dataLoading, setDataLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [profileData, setProfileData] = useState({
     name: '',
@@ -82,11 +83,15 @@ export default function ProfilePage() {
 
   const fetchProfileData = async () => {
     try {
+      setDataLoading(true)
       const response = await fetch('/api/profile', {
         method: 'GET',
         headers: {
-          'Cache-Control': 'no-cache'
-        }
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        },
+        // Add credentials for better session handling
+        credentials: 'include'
       })
       
       if (response.ok) {
@@ -105,6 +110,8 @@ export default function ProfilePage() {
     } catch (error) {
       console.error('Error fetching profile:', error)
       toast.error('An error occurred while fetching profile data')
+    } finally {
+      setDataLoading(false)
     }
   }
 
@@ -139,9 +146,12 @@ export default function ProfilePage() {
 
           if (response.ok) {
             toast.success('Profile image updated successfully!')
+            window.dispatchEvent(new CustomEvent('profileImageUpdated', { 
+              detail: { imageUrl: imageDataUrl } 
+            }))
             setTimeout(() => {
               fetchProfileData()
-            }, 1000)
+            }, 500)
           } else {
             const errorData = await response.json()
             throw new Error(errorData.error || 'Failed to save image')
@@ -201,6 +211,53 @@ export default function ProfilePage() {
   return (
     <>
     <Navbar />
+    {dataLoading ? (
+      // Loading Skeleton
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 pt-24 pb-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Profile Header Skeleton */}
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6 animate-pulse">
+            <div className="h-32 bg-gradient-to-r from-gray-200 to-gray-300"></div>
+            <div className="relative px-6 pb-6">
+              <div className="flex flex-col items-center -mt-16">
+                <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-gray-200"></div>
+                <div className="mt-4 w-48 h-6 bg-gray-200 rounded"></div>
+                <div className="mt-2 w-64 h-4 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Profile Details Skeleton */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8 animate-pulse">
+            <div className="w-64 h-8 bg-gray-200 rounded mb-6"></div>
+            
+            {/* Form Fields Skeleton */}
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {[...Array(6)].map((_, i) => (
+                <div key={i}>
+                  <div className="w-24 h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="w-full h-12 bg-gray-200 rounded"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Address Section Skeleton */}
+            <div className="w-32 h-6 bg-gray-200 rounded mb-4"></div>
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {[...Array(5)].map((_, i) => (
+                <div key={i}>
+                  <div className="w-20 h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="w-full h-12 bg-gray-200 rounded"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Save Button Skeleton */}
+            <div className="w-full h-14 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    ) : (
     <motion.div 
       className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 pt-24 pb-12 px-4"
       variants={containerVariants}
@@ -581,6 +638,7 @@ export default function ProfilePage() {
         </motion.div>
       </div>
     </motion.div>
+    )}
 
     {/* Footer */}
     <Footer />

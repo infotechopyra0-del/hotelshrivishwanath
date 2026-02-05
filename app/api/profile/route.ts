@@ -15,21 +15,16 @@ export async function GET() {
 
     await dbConnect()
 
-    const db = mongoose.connection.db
-    if (!db) {
-      return NextResponse.json({ error: 'Database connection failed' }, { status: 500 })
-    }
-    
-    const user = await db.collection('customers').findOne(
+    // Use direct Customer model for better performance
+    const user = await Customer.findOne(
       { email: session.user.email },
       { 
-        projection: { 
-          password: 0, 
-          emailVerificationToken: 0, 
-          passwordResetToken: 0 
-        } 
+        password: 0, 
+        emailVerificationToken: 0, 
+        passwordResetToken: 0,
+        __v: 0
       }
-    )
+    ).lean() // Use lean() for faster queries
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
@@ -66,7 +61,13 @@ export async function GET() {
       profileImage: user.profileImage || '/images/userdefault.jpeg'
     }
 
-    return NextResponse.json({ success: true, data: profileData }, { status: 200 })
+    return NextResponse.json({ success: true, data: profileData }, { 
+      status: 200,
+      headers: {
+        'Cache-Control': 'private, max-age=60', // Cache for 1 minute
+        'ETag': `"${user._id.toString()}-${user.updatedAt?.getTime() || Date.now()}"`
+      }
+    })
 
   } catch (error) {
     console.error('Profile fetch error:', error)

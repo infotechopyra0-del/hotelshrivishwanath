@@ -12,6 +12,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [userData, setUserData] = useState(null)
+  const [profileImage, setProfileImage] = useState('/images/userdefault.jpeg')
   const pathname = usePathname()
   const { data: session, status } = useSession()
   const dropdownRef = useRef<HTMLDivElement | null>(null)
@@ -21,11 +22,46 @@ const Navbar = () => {
       await signOut({ callbackUrl: '/' })
       setUserData(null)
       setShowUserMenu(false)
+      setProfileImage('/images/userdefault.jpeg')
       document.cookie = 'userEmail=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
     } catch (error) {
       console.error('Logout error:', error)
     }
   }
+
+  // Fetch profile image when user is authenticated
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      if (status === 'authenticated' && session?.user?.email) {
+        try {
+          const response = await fetch('/api/profile')
+          if (response.ok) {
+            const result = await response.json()
+            if (result.success && result.data.profileImage) {
+              setProfileImage(result.data.profileImage)
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching profile image:', error)
+        }
+      } else {
+        setProfileImage('/images/userdefault.jpeg')
+      }
+    }
+    
+    fetchProfileImage()
+    
+    // Listen for profile image updates
+    const handleProfileImageUpdate = (event: any) => {
+      setProfileImage(event.detail.imageUrl)
+    }
+    
+    window.addEventListener('profileImageUpdated', handleProfileImageUpdate)
+    
+    return () => {
+      window.removeEventListener('profileImageUpdated', handleProfileImageUpdate)
+    }
+  }, [status, session])
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -64,7 +100,7 @@ const Navbar = () => {
       >
         <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-varanasi-gold/50">
           <Image
-            src="/images/userdefault.jpeg"
+            src={profileImage}
             alt="Profile"
             fill
             className="object-cover"
@@ -204,10 +240,11 @@ const Navbar = () => {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     className="p-2 hover:bg-varanasi-gold/10 rounded-full transition-colors"
+                    suppressHydrationWarning
                   >
                     <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-varanasi-gold/50">
                       <Image
-                        src="/images/userdefault.jpeg"
+                        src={profileImage}
                         alt="Profile"
                         fill
                         className="object-cover"
@@ -266,6 +303,7 @@ const Navbar = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
                 className="p-2 hover:bg-varanasi-gold/10 rounded-lg transition-colors flex-shrink-0"
+                suppressHydrationWarning
               >
                 {isOpen ? (
                   <X className="w-5 h-5 md:w-6 md:h-6 text-varanasi-maroon" />

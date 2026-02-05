@@ -64,7 +64,7 @@ const Hero: React.FC<HeroProps> = ({
       {backgroundImages.length > 0 ? (
         backgroundImages.map((image, index) => (
           <motion.div
-            key={index}
+            key={`bg-image-${index}`}
             className="absolute inset-0 w-full h-full"
             style={{
               backgroundImage: image.startsWith('linear') || image.startsWith('url') ? image : `linear-gradient(135deg, rgba(59, 31, 13, 0.6) 0%, rgba(107, 26, 26, 0.5) 100%), url('${image}')`,

@@ -20,10 +20,8 @@ export async function GET(req: NextRequest) {
       .populate('room', 'roomNumber roomType')
       .sort({ createdAt: -1 })
       .lean();
-
     return NextResponse.json(bookings, { status: 200 });
   } catch (error) {
-    console.error('Error fetching bookings:', error);
     return NextResponse.json(
       { error: 'Failed to fetch bookings' },
       { status: 500 }
@@ -76,7 +74,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(populatedBooking, { status: 201 });
   } catch (error) {
-    console.error('Error creating booking:', error);
     return NextResponse.json(
       { error: 'Failed to create booking' },
       { status: 500 }

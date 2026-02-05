@@ -59,7 +59,6 @@ export async function PUT(
       message: 'FAQ updated successfully',
     });
   } catch (error: any) {
-    console.error('Error updating FAQ:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update FAQ' },
       { status: 500 }
@@ -103,7 +102,6 @@ export async function DELETE(
       message: 'FAQ deleted successfully',
     });
   } catch (error: any) {
-    console.error('Error deleting FAQ:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to delete FAQ' },
       { status: 500 }
