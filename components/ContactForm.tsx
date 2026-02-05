@@ -27,10 +27,7 @@ export const ContactForm = () => {
       inquiry_type: formData.get('inquiry_type') as string,
       message: formData.get('message') as string,
     }
-
     console.log("Submitting contact form with data:", contactData)
-
-    // Basic validation
     if (!contactData.name?.trim() || !contactData.email?.trim() || !contactData.message?.trim()) {
       toast.error("Please fill in all required fields.")
       setIsSubmitting(false)
@@ -77,7 +74,6 @@ export const ContactForm = () => {
       <h2 className="font-serif text-2xl font-bold text-varanasi-maroon mb-6">
         Send us a Message
       </h2>
-
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-varanasi-maroon mb-2">
@@ -91,7 +87,6 @@ export const ContactForm = () => {
             placeholder="Your name"
           />
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-varanasi-maroon mb-2">
