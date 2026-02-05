@@ -29,9 +29,12 @@ const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
 
   const fetchRooms = async () => {
     try {
+      console.log('🔄 Fetching rooms...')
       const res = await fetch('/api/rooms')
       if (!res.ok) throw new Error('Failed to fetch rooms')
       const data: Room[] = await res.json()
+      
+      console.log('📊 Rooms data received:', data.length, data)
       
       // Sort by featured status
       const sortedData = data.sort((a, b) => {
@@ -40,9 +43,10 @@ const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
         return 0
       })
       
+      console.log('✅ Setting rooms:', sortedData.length)
       setRooms(sortedData)
     } catch (error) {
-      console.error('Error fetching rooms:', error)
+      console.error('❌ Error fetching rooms:', error)
       setRooms([])
     } finally {
       setLoading(false)
@@ -50,6 +54,8 @@ const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
   }
 
   const displayRooms = showAll ? rooms : rooms.slice(0, 3)
+
+  console.log('🎯 Display rooms:', displayRooms.length, displayRooms)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -180,6 +186,35 @@ const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
     )
   }
 
+  // Add no rooms state
+  if (!loading && rooms.length === 0) {
+    return (
+      <section className="py-20 md:py-28 bg-gradient-to-b from-varanasi-cream via-varanasi-cream to-varanasi-cream-dark">
+        <div className="container-custom">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
+          >
+            <span className="text-varanasi-gold text-2xl block mb-3">◆ ◆ ◆</span>
+            <h2 className="font-serif text-4xl md:text-5xl font-bold text-varanasi-maroon mb-6">
+              Our Luxurious Rooms
+            </h2>
+            <p className="text-varanasi-brown text-lg max-w-2xl mx-auto leading-relaxed mb-8">
+              Choose from our carefully curated selection of elegant rooms with Varanasi heritage aesthetics
+            </p>
+            <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-varanasi-gold/20 max-w-md mx-auto">
+              <p className="text-varanasi-maroon text-lg font-semibold">No rooms available at the moment</p>
+              <p className="text-varanasi-brown text-sm mt-2">Please check back later or contact us for availability</p>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="py-20 md:py-28 bg-gradient-to-b from-varanasi-cream via-varanasi-cream to-varanasi-cream-dark">
       <div className="container-custom">
@@ -198,13 +233,7 @@ const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
             Choose from our carefully curated selection of elegant rooms with Varanasi heritage aesthetics
           </p>
         </motion.div>
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayRooms.map((room, idx) => {
             const roomId = room._id || room.id || `room-${idx}`;
             const imageUrl = typeof room.image === 'string' ? room.image : room.image?.url || '';
@@ -212,8 +241,11 @@ const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
             return (
               <motion.div
                 key={String(roomId)}
-                variants={itemVariants}
-                whileHover={{ y: -20, boxShadow: '0 25px 50px rgba(232, 185, 35, 0.25)' }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
+                whileHover={{ y: -10, boxShadow: '0 25px 50px rgba(232, 185, 35, 0.25)' }}
                 className="group rounded-2xl overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-varanasi-gold/20 hover:border-varanasi-gold/50"
               >
                 {/* Image Container */}
@@ -298,7 +330,7 @@ const RoomsSection: React.FC<{ showAll?: boolean }> = ({ showAll = false }) => {
               </motion.div>
             )
           })}
-        </motion.div>
+        </div>
 
         {!showAll && rooms.length > 3 && (
           <motion.div

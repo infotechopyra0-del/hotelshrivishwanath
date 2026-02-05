@@ -10,8 +10,6 @@ import Contact from "@/models/Contact";
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
-
-    // Fetch all counts in parallel for better performance
     const [
       totalUsers,
       totalBookings,
