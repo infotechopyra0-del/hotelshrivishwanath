@@ -7,7 +7,7 @@ import { authOptions } from '@/lib/auth'
 // GET - Fetch specific booking details
 export async function GET(
   req: NextRequest,
-  { params }: { params: { bookingId: string } }
+  { params }: { params: Promise<{ bookingId: string }> }
 ) {
   try {
     await dbConnect()
@@ -21,8 +21,10 @@ export async function GET(
       )
     }
 
+    const { bookingId } = await params;
+
     const booking = await Booking.findOne({
-      bookingId: params.bookingId,
+      bookingId: bookingId,
       customer: session.user.id
     })
       .populate({
@@ -64,7 +66,7 @@ export async function GET(
 // PATCH - Cancel a booking
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { bookingId: string } }
+  { params }: { params: Promise<{ bookingId: string }> }
 ) {
   try {
     await dbConnect()
@@ -80,8 +82,10 @@ export async function PATCH(
 
     const { reason } = await req.json()
 
+    const { bookingId } = await params;
+
     const booking = await Booking.findOne({
-      bookingId: params.bookingId,
+      bookingId: bookingId,
       customer: session.user.id
     })
 
